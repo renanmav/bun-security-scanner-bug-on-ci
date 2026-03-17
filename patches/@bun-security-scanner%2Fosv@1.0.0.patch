@@ -1,0 +1,58 @@
+diff --git a/node_modules/@bun-security-scanner/osv/.bun-tag-33bd3c55db7db909 b/.bun-tag-33bd3c55db7db909
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/src/index.ts b/src/index.ts
+index 9a8a183f0efe3e272095350a30272fc565858fc7..91e02e97fab020f2f9955fd3d6a9360899be3ec4 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -17,32 +17,39 @@ export const scanner: Bun.Security.Scanner = {
+ 	version: "1", // This is the version of Bun security scanner implementation. You should keep this set as '1'
+ 
+ 	async scan({ packages }) {
+-		try {
+-			logger.info(`Starting OSV scan for ${packages.length} packages`);
++		const isCI = !!Bun.env.CI;
++		logger.info(`[osv-patch] Scanner started (CI=${isCI}, packages=${packages.length})`);
+ 
+-			// Initialize components
++		try {
++			logger.info(`[osv-patch] Initializing OSV client and processor`);
+ 			const client = new OSVClient();
+ 			const processor = new VulnerabilityProcessor();
+ 
+-			// Fetch vulnerabilities from OSV.dev
++			logger.info(`[osv-patch] Querying OSV for vulnerabilities...`);
+ 			const vulnerabilities = await client.queryVulnerabilities(packages);
++			logger.info(`[osv-patch] Found ${vulnerabilities.length} raw vulnerabilities`);
+ 
+-			// Process vulnerabilities into security advisories
++			logger.info(`[osv-patch] Processing vulnerabilities into advisories...`);
+ 			const advisories = processor.processVulnerabilities(
+ 				vulnerabilities,
+ 				packages,
+ 			);
++			logger.info(`[osv-patch] Generated ${advisories.length} advisories: ${advisories.map((a) => `${a.package}@${a.level}`).join(", ") || "none"}`);
+ 
+-			logger.info(
+-				`OSV scan completed: ${advisories.length} advisories found for ${packages.length} packages`,
+-			);
++			// In CI (non-interactive), filter out warnings to prevent blocking install
++			if (isCI) {
++				const warnings = advisories.filter((a) => a.level === "warn");
++				const fatals = advisories.filter((a) => a.level === "fatal");
++				logger.info(`[osv-patch] CI mode: suppressing ${warnings.length} warnings, keeping ${fatals.length} fatals`);
++				logger.info(`[osv-patch] Returning ${fatals.length} advisories to bun`);
++				return fatals;
++			}
+ 
++			logger.info(`[osv-patch] Local mode: returning all ${advisories.length} advisories`);
+ 			return advisories;
+ 		} catch (error) {
+ 			const message = error instanceof Error ? error.message : String(error);
+-			logger.error("OSV scanner encountered an unexpected error", {
+-				error: message,
+-			});
++			logger.error(`[osv-patch] Scanner error: ${message}`);
+ 
+ 			// Fail-safe: allow installation to proceed on scanner errors
+ 			return [];

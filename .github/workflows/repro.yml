@@ -17,7 +17,7 @@ jobs:
         run: bun install
 
   frozen-lockfile:
-    name: "frozen-lockfile: bun install --frozen-lockfile"
+    name: "frozen-lockfile"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,38 +26,16 @@ jobs:
         run: bun install --frozen-lockfile
 
   frozen-prefer-offline:
-    name: "frozen+offline: bun install --frozen-lockfile --prefer-offline"
+    name: "frozen + prefer-offline"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - name: bun install --frozen-lockfile --prefer-offline
         run: bun install --frozen-lockfile --prefer-offline
-
-  safe-chain-frozen:
-    name: "safe-chain + frozen-lockfile"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - name: Install safe-chain
-        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-      - name: bun install --frozen-lockfile
-        run: bun install --frozen-lockfile
 
   safe-chain-frozen-offline:
-    name: "safe-chain + frozen-lockfile + prefer-offline"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - name: Install safe-chain
-        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-      - name: bun install --frozen-lockfile --prefer-offline
-        run: bun install --frozen-lockfile --prefer-offline
-
-  safe-chain-frozen-offline-npmrc:
-    name: "safe-chain + frozen + offline + .npmrc private registry"
+    name: "safe-chain + frozen + offline"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,7 +48,7 @@ jobs:
           PRIVATE_REGISTRY_TOKEN: fake-token-for-testing
 
   full-lava-setup:
-    name: "full lava-platform setup (safe-chain + preinstall + frozen + offline + .npmrc)"
+    name: "full lava setup (safe-chain + frozen + offline + .npmrc + postinstall)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
