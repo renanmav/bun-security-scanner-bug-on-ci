@@ -1,4 +1,7 @@
 telemetry = false
 
+[install]
+frozenLockfile = true
+
 [install.security]
 scanner = "@bun-security-scanner/osv"
