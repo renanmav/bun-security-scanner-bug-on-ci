@@ -5,6 +5,9 @@
   "scripts": {
     "preinstall": "bunx @aikidosec/safe-chain@latest setup-ci"
   },
+  "dependencies": {
+    "undici": "5.28.0"
+  },
   "devDependencies": {
     "@bun-security-scanner/osv": "1.0.0"
   }
