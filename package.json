@@ -2,6 +2,9 @@
   "name": "bun-security-scanner-bug-repro",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "preinstall": "bunx @aikidosec/safe-chain@latest setup-ci"
+  },
   "devDependencies": {
     "@bun-security-scanner/osv": "1.0.0"
   }

@@ -7,13 +7,35 @@ on:
     branches: [main]
 
 jobs:
-  repro:
-    name: bun install with security scanner
+  without-safe-chain:
+    name: bun install WITHOUT safe-chain
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: oven-sh/setup-bun@v2
-
-      - name: bun install (expected to fail silently)
+      - name: bun install
         run: bun install
+
+  with-safe-chain:
+    name: bun install WITH safe-chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      - name: bun install
+        run: bun install
+
+  with-safe-chain-and-preinstall:
+    name: bun install WITH safe-chain + preinstall script
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      - name: bun install (with preinstall)
+        run: bun install
+        env:
+          RUN_PREINSTALL: "true"
