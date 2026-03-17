@@ -1,0 +1,4 @@
+telemetry = false
+
+[install.security]
+scanner = "@bun-security-scanner/osv"

@@ -1,0 +1,19 @@
+name: Reproduce silent exit code 1
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  repro:
+    name: bun install with security scanner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: bun install (expected to fail silently)
+        run: bun install
