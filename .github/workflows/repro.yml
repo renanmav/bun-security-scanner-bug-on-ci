@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  without-safe-chain:
-    name: bun install WITHOUT safe-chain
+  baseline:
+    name: "baseline: bun install (no flags)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,26 +16,69 @@ jobs:
       - name: bun install
         run: bun install
 
-  with-safe-chain:
-    name: bun install WITH safe-chain
+  frozen-lockfile:
+    name: "frozen-lockfile: bun install --frozen-lockfile"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - name: Install safe-chain
-        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-      - name: bun install
-        run: bun install
+      - name: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
-  with-safe-chain-and-preinstall:
-    name: bun install WITH safe-chain + preinstall script
+  frozen-prefer-offline:
+    name: "frozen+offline: bun install --frozen-lockfile --prefer-offline"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: bun install --frozen-lockfile --prefer-offline
+        run: bun install --frozen-lockfile --prefer-offline
+
+  safe-chain-frozen:
+    name: "safe-chain + frozen-lockfile"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - name: Install safe-chain
         run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-      - name: bun install (with preinstall)
-        run: bun install
+      - name: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile
+
+  safe-chain-frozen-offline:
+    name: "safe-chain + frozen-lockfile + prefer-offline"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      - name: bun install --frozen-lockfile --prefer-offline
+        run: bun install --frozen-lockfile --prefer-offline
+
+  safe-chain-frozen-offline-npmrc:
+    name: "safe-chain + frozen + offline + .npmrc private registry"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      - name: bun install --frozen-lockfile --prefer-offline
+        run: bun install --frozen-lockfile --prefer-offline
         env:
-          RUN_PREINSTALL: "true"
+          PRIVATE_REGISTRY_TOKEN: fake-token-for-testing
+
+  full-lava-setup:
+    name: "full lava-platform setup (safe-chain + preinstall + frozen + offline + .npmrc)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      - name: bun install --frozen-lockfile --prefer-offline
+        run: bun install --frozen-lockfile --prefer-offline
+        env:
+          PRIVATE_REGISTRY_TOKEN: fake-token-for-testing
+          npm_config_mpp_env: prod
